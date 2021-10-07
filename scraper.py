@@ -1,7 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
+import time
 
-URL = 'https://skinport.com/market?pricegt=100&sort=percent&order=desc'
+URL = 'https://skinport.com/market'
 page = requests.get(URL)
 
 
@@ -10,26 +11,64 @@ def getSkins():
 
     soup = BeautifulSoup(page.content, 'html.parser')
 
+    time.sleep(1)
+
     results = soup.find(id="content")
+
+    time.sleep(1)
 
     skinListings = results.find_all("div", class_="CatalogPage-item CatalogPage-item--grid")
 
+    time.sleep(1)
 
     for skinListing in skinListings:
-        weaponName = skinListing.find("div", class_="ItemPreview-itemTitle")
-        skinName = skinListing.find("div", class_="ItemPreview-itemName")
-        floatValue = skinListing.find("div", class_="WearBar-value")
-        skinPrice = skinListing.find("div", class_="Tooltip-link")
-        skinDiscount = skinListing.find("div", class_="GradientLabel ItemPreview-discount")
+        skin = {}
+
+
+        skin['fullInfo'] = skinListing.find("a", class_="ItemPreview-href").text
+        skin['itemName'] = skinListing.find("div", class_="ItemPreview-itemTitle").text
+        skin['skinName'] = skinListing.find("div", class_="ItemPreview-itemName").text
+        skin['skinRarity'] = skinListing.find("div", class_="ItemPreview-itemText").text
+        
+        noFloatItems = ["StatTrak™ Music Kit", "Sticker", "Container", "Graffiti", "Music Kit", "Key", "Patch", "Collectible", "Pass"]
+        
+        if skin['itemName'] in noFloatItems:
+            skin['floatValue'] = "None"
+        elif "Agent" in skin['skinRarity']:
+            skin['floatValue'] = "None"
+        else:
+            floatValue = skinListing.find("div", class_="WearBar-value")
+            skin['floatValue'] = floatValue
+
+        skin['price'] = skinListing.find("div", class_="Tooltip-link").text.replace("€", "")
+
+        tradeTop = skinListing.find("div", class_="ItemPreview-top")
+        if tradeTop.div.text == "Tradeable":
+            skin['tradeLock'] = "Tradeable"
+        else:
+            skin['tradeLock'] = tradeTop.div.text.replace("in ", "")
+        
+
+        try:
+            skin['skinDiscount'] = skinListing.find("div", class_="GradientLabel ItemPreview-discount").text.replace("- ", "")
+        except:
+            skin['skinDiscount'] = "None"
+
+
+
+        skinWebpage = skinListing.find("a", class_="ItemPreview-link")["href"]
+        skin['webpage'] = f"https://skinport.com{skinWebpage}"
+
+        skin['previewImage'] = skinListing.find("img")["src"]
+
+
+        skins.append(skin)
+
+    time.sleep(1)
+    
+    return skins
     
 
-        print(skinDiscount.span)
-        print("\n")
-    # print(weaponName.text)
-    # print(skinName.text)
-    # print(floatValue.text)
-    # print("\n=================\n")
 
-    # print(skinListing.prettify(), end="\n ===================== \n")
-
+print(getSkins())
 # print(results.prettify())
