@@ -1,6 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
 import time
+import csv
+
 
 URL = 'https://skinport.com/market'
 page = requests.get(URL)
@@ -14,8 +16,6 @@ def getSkins():
     time.sleep(1)
 
     results = soup.find(id="content")
-
-    time.sleep(1)
 
     skinListings = results.find_all("div", class_="CatalogPage-item CatalogPage-item--grid")
 
@@ -34,18 +34,8 @@ def getSkins():
             skin['floatValue'] = skinListing.find("div", class_="WearBar-value").text.replace("<div class=\"WearBar-value\">", "").replace("</div>","")
         except:
             skin['floatValue'] = "None"
-        noFloatItems = ["StatTrak™ Music Kit", "Sticker", "Container", "Graffiti", "Music Kit", "Key", "Patch", "Collectible", "Pass"]
-        
-        # if skin['itemName'] in noFloatItems:
-        #     skin['floatValue'] = "None"
-        # elif "Agent" in skin['skinRarity']:
-        #     skin['floatValue'] = "None"
-        # else:
 
-        #     floatValue = skinListing.find("div", class_="WearBar-value")
-        #     skin['floatValue'] = floatValue.replace('<div class="WearBar-value">', '')
-
-        skin['price'] = skinListing.find("div", class_="Tooltip-link").text.replace("€", "")
+        skin['price'] = skinListing.find("div", class_="Tooltip-link").text.replace("€", "").replace(",", "")
 
         tradeTop = skinListing.find("div", class_="ItemPreview-top")
         if tradeTop.div.text == "Tradeable":
@@ -60,7 +50,6 @@ def getSkins():
             skin['skinDiscount'] = "None"
 
 
-
         skinWebpage = skinListing.find("a", class_="ItemPreview-link")["href"]
         skin['webpage'] = f"https://skinport.com{skinWebpage}"
 
@@ -73,7 +62,15 @@ def getSkins():
     
     return skins
     
+def save_data(skins):
+    with open("data/skins_market.csv", 'w', encoding='UTF-8', newline="") as f:
+        colon_name = ['fullInfo', 'itemName', 'skinName', 'skinRarity', 'floatValue', 'price', 'tradeLock', 'skinDiscount', 'webpage', 'previewImage']
+        w = csv.DictWriter(f, fieldnames= colon_name)
+        w.writeheader()
+        for skin in skins:
+            w.writerow(skin)
+
+save_data(getSkins())
 
 
-print(getSkins())
-# print(results.prettify())
+
