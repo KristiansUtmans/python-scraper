@@ -30,15 +30,20 @@ def getSkins():
         skin['skinName'] = skinListing.find("div", class_="ItemPreview-itemName").text
         skin['skinRarity'] = skinListing.find("div", class_="ItemPreview-itemText").text
         
+        try:
+            skin['floatValue'] = skinListing.find("div", class_="WearBar-value").text.replace("<div class=\"WearBar-value\">", "").replace("</div>","")
+        except:
+            skin['floatValue'] = "None"
         noFloatItems = ["StatTrak™ Music Kit", "Sticker", "Container", "Graffiti", "Music Kit", "Key", "Patch", "Collectible", "Pass"]
         
-        if skin['itemName'] in noFloatItems:
-            skin['floatValue'] = "None"
-        elif "Agent" in skin['skinRarity']:
-            skin['floatValue'] = "None"
-        else:
-            floatValue = skinListing.find("div", class_="WearBar-value")
-            skin['floatValue'] = floatValue
+        # if skin['itemName'] in noFloatItems:
+        #     skin['floatValue'] = "None"
+        # elif "Agent" in skin['skinRarity']:
+        #     skin['floatValue'] = "None"
+        # else:
+
+        #     floatValue = skinListing.find("div", class_="WearBar-value")
+        #     skin['floatValue'] = floatValue.replace('<div class="WearBar-value">', '')
 
         skin['price'] = skinListing.find("div", class_="Tooltip-link").text.replace("€", "")
 
