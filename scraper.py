@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import time
 import csv
 
+
 URL = 'https://skinport.com/market'
 page = requests.get(URL)
 
@@ -15,8 +16,6 @@ def getSkins():
     time.sleep(1)
 
     results = soup.find(id="content")
-
-    time.sleep(1)
 
     skinListings = results.find_all("div", class_="CatalogPage-item CatalogPage-item--grid")
 
@@ -36,7 +35,7 @@ def getSkins():
         except:
             skin['floatValue'] = "None"
 
-        skin['price'] = skinListing.find("div", class_="Tooltip-link").text.replace("€", "")
+        skin['price'] = skinListing.find("div", class_="Tooltip-link").text.replace("€", "").replace(",", "")
 
         tradeTop = skinListing.find("div", class_="ItemPreview-top")
         if tradeTop.div.text == "Tradeable":
@@ -71,5 +70,7 @@ def save_data(skins):
         for skin in skins:
             w.writerow(skin)
 
-
 save_data(getSkins())
+
+
+
