@@ -1,2 +1,10 @@
-# python-scraper
-Beautiful Soup: Web Scraper With Python
+# Counter-Strike: Global Offensive skinu cenas un raksturojuma web scraper.
+## Dati:
+- itemName
+- skinName
+- skinRarity
+- tradeLock
+- skinDiscount
+- webpage
+- previewImage
+Datu izvade ir csv failā.
